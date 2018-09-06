@@ -72,14 +72,14 @@ public class ProductController {
 	}
 
 
-//	@ApiOperation(value = "Recupere les produits par ordre alphabetique")
-//	@GetMapping(value = "/product/name/order")
-//	public List<Product> trierProduitsParOrdreAlphabetique() {
-//
-//		final List<Product> foundProducts = this.productDao.findByOrderByName();
-//
-//		return foundProducts;
-//	}
+	@ApiOperation(value = "Recupere les produits par ordre alphabetique")
+	@GetMapping(value = "/product/name/order")
+	public List<Product> trierProduitsParOrdreAlphabetique() {
+
+		final List<Product> foundProducts = this.productDao.findByOrderByName();
+
+		return foundProducts;
+	}
 
 
 	@ApiOperation(value = "Recupere les produits au prix superieur au prixLimit")
