@@ -1,108 +1,143 @@
 package com.ecommerce.microcommerce.web.controller;
 
-import com.ecommerce.microcommerce.dao.ProductDao;
-import com.ecommerce.microcommerce.model.Product;
-import com.ecommerce.microcommerce.web.exceptions.ProduitIntrouvableException;
-import com.fasterxml.jackson.databind.ser.FilterProvider;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJacksonValue;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
-import java.net.URI;
-import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ecommerce.microcommerce.dao.ProductDao;
+import com.ecommerce.microcommerce.model.Product;
+import com.ecommerce.microcommerce.web.beans.ProductBean;
+import com.ecommerce.microcommerce.web.exceptions.FreeProductException;
+import com.ecommerce.microcommerce.web.exceptions.NotFoundProductException;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 
-@Api( description="API pour es opérations CRUD sur les produits.")
-
+/*
+ * the parameter is deprecated but unfortunatly
+ * i did not manage to find a replacement
+ * and so i am just going to hope it works for you all as well
+ */
+@Api(description = "API de gestion de produits.")
 @RestController
 public class ProductController {
 
-    @Autowired
-    private ProductDao productDao;
+	private ProductDao productDao;
 
+	@Autowired
+	public void setProductDao(final ProductDao productDao) {
 
-    //Récupérer la liste des produits
+		this.productDao = productDao;
+	}
 
-    @RequestMapping(value = "/Produits", method = RequestMethod.GET)
+	@ApiOperation(value = "Recupere tout les produits")
+	@ResponseStatus(value = HttpStatus.FOUND)
+	@GetMapping(value = "/product")
+	public List<Product> getAllProducts() {
 
-    public MappingJacksonValue listeProduits() {
+		final List<Product> foundProducts = this.productDao.findAll();
 
-        Iterable<Product> produits = productDao.findAll();
+		return foundProducts;
+	}
 
-        SimpleBeanPropertyFilter monFiltre = SimpleBeanPropertyFilter.serializeAllExcept("prixAchat");
+//	@GetMapping(value = "/product/margin")
+	@ApiOperation(value = "Recupere tout les produits avec leur marges")
+	@ResponseStatus(value = HttpStatus.FOUND)
+	@GetMapping(value = "/AdminProduits")
+	public List<ProductBean> getAllProductsWithMargins() {
 
-        FilterProvider listDeNosFiltres = new SimpleFilterProvider().addFilter("monFiltreDynamique", monFiltre);
+		final List<Product> products = this.productDao.findAll();
+		final List<ProductBean> productBeans = new ArrayList<>();
 
-        MappingJacksonValue produitsFiltres = new MappingJacksonValue(produits);
+		for (final Product product : products) {
+			productBeans.add(new ProductBean(product.getName(), product.getPrice(), product.getBoughtAtPrice()));
+		}
 
-        produitsFiltres.setFilters(listDeNosFiltres);
+		return productBeans;
+	}
 
-        return produitsFiltres;
-    }
+	@ApiOperation(value = "Recupere les produits par ordre alphabetique")
+	@ResponseStatus(value = HttpStatus.FOUND)
+	@GetMapping(value = "/product/order/name")
+	public List<Product> getAllProductsOrderedByName() {
 
+		final List<Product> foundProducts = this.productDao.findByOrderByName();
 
-    //Récupérer un produit par son Id
-    @ApiOperation(value = "Récupère un produit grâce à son ID à condition que celui-ci soit en stock!")
-    @GetMapping(value = "/Produits/{id}")
+		return foundProducts;
+	}
 
-    public Product afficherUnProduit(@PathVariable int id) {
+	@ApiOperation(value = "Recupere les produits au prix superieur au prixLimit")
+	@ResponseStatus(value = HttpStatus.FOUND)
+	@GetMapping(value = "/test/product/price/greater/{limitPrice}")
+	public List<Product> getProductsByPrixLimit(@PathVariable final Float limitPrice) {
 
-        Product produit = productDao.findById(id);
+		final List<Product> foundProducts = this.productDao.findByPriceGreaterThan(limitPrice);
 
-        if(produit==null) throw new ProduitIntrouvableException("Le produit avec l'id " + id + " est INTROUVABLE. Écran Bleu si je pouvais.");
+		return foundProducts;
+	}
 
-        return produit;
-    }
+	@ApiOperation(value = "Recupere un produit par son ID si il existe")
+	@ResponseStatus(value = HttpStatus.FOUND)
+	@GetMapping(value = "/product/{id}")
+	public Product getProductById(@PathVariable final Long id) throws NotFoundProductException {
 
+		final Optional<Product> foundProduct = this.productDao.findById(id);
 
+		if (!foundProduct.isPresent()) {
+			throw new NotFoundProductException(new String("Nothing found"));
+		}
 
+		return foundProduct.get();
+	}
 
-    //ajouter un produit
-    @PostMapping(value = "/Produits")
+	/*
+	 * for the sake of laziness and my sanity i did not see the appeal
+	 * in the defining of a ResponseEntity
+	 * and so i used the @ResponseStatus annotation instead
+	 * which in this case has the same effect
+	 */
+	@ApiOperation(value = "Cree un produit")
+	@ResponseStatus(value = HttpStatus.CREATED)
+	@PostMapping(value = "/product")
+	public void postProduct(@Valid @RequestBody final Product product) throws FreeProductException {
 
-    public ResponseEntity<Void> ajouterProduit(@Valid @RequestBody Product product) {
+		if (product.getPrice() <= 0) {
+			throw new FreeProductException(new String("Price value cannot be less or equal to 0"));
+		} else if (product.getBoughtAtPrice() <= 0) {
+			throw new FreeProductException(new String("BoughtAtPrice value cannot be less or equal to 0"));
+		} else {
+			this.productDao.save(product);
+		}
+	}
 
-        Product productAdded =  productDao.save(product);
+	@ApiOperation(value = "Remplace un produit par son ID si il existe")
+	@ResponseStatus(value = HttpStatus.ACCEPTED)
+	@PutMapping(value = "/product")
+	public void putProductById(@Valid @RequestBody final Product product) {
 
-        if (productAdded == null)
-            return ResponseEntity.noContent().build();
+		this.productDao.save(product);
+	}
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(productAdded.getId())
-                .toUri();
+	@ApiOperation(value = "Supprime un produit")
+	@ResponseStatus(value = HttpStatus.ACCEPTED)
+	@DeleteMapping(value = "/product/{id}")
+	public void removeProductById(@PathVariable final Long id) {
 
-        return ResponseEntity.created(location).build();
-    }
-
-    @DeleteMapping (value = "/Produits/{id}")
-    public void supprimerProduit(@PathVariable int id) {
-
-        productDao.delete(id);
-    }
-
-    @PutMapping (value = "/Produits")
-    public void updateProduit(@RequestBody Product product) {
-
-        productDao.save(product);
-    }
-
-
-    //Pour les tests
-    @GetMapping(value = "test/produits/{prix}")
-    public List<Product>  testeDeRequetes(@PathVariable int prix) {
-
-        return productDao.chercherUnProduitCher(400);
-    }
-
-
-
+		this.productDao.deleteById(id);
+	}
 }

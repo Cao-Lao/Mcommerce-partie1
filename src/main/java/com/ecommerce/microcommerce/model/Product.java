@@ -1,80 +1,90 @@
 package com.ecommerce.microcommerce.model;
 
-import com.fasterxml.jackson.annotation.JsonFilter;
-import org.hibernate.validator.constraints.Length;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.validation.constraints.Min;
+
+import org.hibernate.validator.constraints.Length;
+
 
 @Entity
-//@JsonFilter("monFiltreDynamique")
 public class Product {
 
-    @Id
-    @GeneratedValue
-    private int id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-    @Length(min=3, max=20, message = "Nom trop long ou trop court. Et oui messages sont plus stylés que ceux de Spring")
-    private String nom;
+	@Length(min = 3, max = 20)
+	@Column(nullable = false)
+	private String name;
 
-    @Min(value = 1)
-    private int prix;
+	@Column(nullable = false)
+	private Float price;
 
-    //information que nous ne souhaitons pas exposer
-    private int prixAchat;
+	@Column(nullable = false)
+	private Float boughtAtPrice;
 
-    //constructeur par défaut
-    public Product() {
-    }
+	public Product() {
 
-    //constructeur pour nos tests
-    public Product(int id, String nom, int prix, int prixAchat) {
-        this.id = id;
-        this.nom = nom;
-        this.prix = prix;
-        this.prixAchat = prixAchat;
-    }
+	}
 
-    public int getId() {
-        return id;
-    }
+	public Product(final Long id, final String name, final Float price, final Float boughtAtPrice) {
 
-    public void setId(int id) {
-        this.id = id;
-    }
+		this.id = id;
+		this.name = name;
+		this.price = price;
+		this.boughtAtPrice = boughtAtPrice;
+	}
 
-    public String getNom() {
-        return nom;
-    }
+	public Long getId() {
 
-    public void setNom(String nom) {
-        this.nom = nom;
-    }
+		return this.id;
+	}
 
-    public int getPrix() {
-        return prix;
-    }
 
-    public void setPrix(int prix) {
-        this.prix = prix;
-    }
+	public String getName() {
 
-    public int getPrixAchat() {
-        return prixAchat;
-    }
+		return this.name;
+	}
 
-    public void setPrixAchat(int prixAchat) {
-        this.prixAchat = prixAchat;
-    }
 
-    @Override
-    public String toString() {
-        return "Product{" +
-                "id=" + id +
-                ", nom='" + nom + '\'' +
-                ", prix=" + prix +
-                '}';
-    }
+	public Float getPrice() {
+
+		return this.price;
+	}
+
+	public Float getBoughtAtPrice() {
+
+		return this.boughtAtPrice;
+	}
+
+	public void setId(final Long id) {
+
+		this.id = id;
+	}
+
+
+	public void setName(final String name) {
+
+		this.name = name;
+	}
+
+
+	public void setPrice(final Float price) {
+
+		this.price = price;
+	}
+
+	public void setBoughtAtPrice(final Float boughtAtPrice) {
+
+		this.boughtAtPrice = boughtAtPrice;
+	}
+
+	@Override
+	public String toString() {
+
+		return "Product [id=" + this.id + ", name=" + this.name + ", price=" + this.price + ", boughtAtPrice=" + this.boughtAtPrice + "]";
+	}
 }
