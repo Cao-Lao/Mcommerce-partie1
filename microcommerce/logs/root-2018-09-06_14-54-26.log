@@ -1,2 +1,0 @@
-2018-09-06 14:54:31.190 [WARN ] [Thread-4] o.s.b.f.s.DisposableBeanAdapter - Invocation of destroy method failed on bean with name 'inMemoryDatabaseShutdownExecutor': org.h2.jdbc.JdbcSQLException: La base de données est déjà fermée (pour désactiver la fermeture automatique à larrêt de la VM, ajoutez "; DB_CLOSE_ON_EXIT = FALSE" à lURL db)
-Database is already closed (to disable automatic closing at VM shutdown, add ";DB_CLOSE_ON_EXIT=FALSE" to the db URL) [90121-197] 
