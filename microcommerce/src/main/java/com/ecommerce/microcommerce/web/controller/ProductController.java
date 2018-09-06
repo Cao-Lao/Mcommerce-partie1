@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ecommerce.microcommerce.dao.ProductDao;
 import com.ecommerce.microcommerce.model.Product;
 import com.ecommerce.microcommerce.web.beans.ProductBean;
-import com.ecommerce.microcommerce.web.exceptions.FreeProductException;
 import com.ecommerce.microcommerce.web.exceptions.NotFoundProductException;
 
 import io.swagger.annotations.Api;
@@ -72,14 +71,14 @@ public class ProductController {
 		return productBeans;
 	}
 
-	@ApiOperation(value = "Recupere les produits par ordre alphabetique")
-	@GetMapping(value = "/product/order/name")
-	public List<Product> trierProduitsParOrdreAlphabetique() {
-
-		final List<Product> foundProducts = this.productDao.findByOrderByName();
-
-		return foundProducts;
-	}
+//	@ApiOperation(value = "Recupere les produits par ordre alphabetique")
+//	@GetMapping(value = "/product/order/name")
+//	public List<Product> trierProduitsParOrdreAlphabetique() {
+//
+//		final List<Product> foundProducts = this.productDao.findByOrderByName();
+//
+//		return foundProducts;
+//	}
 
 	@ApiOperation(value = "Recupere les produits au prix superieur au prixLimit")
 	@GetMapping(value = "/test/product/price/greater/{limitPrice}")
@@ -112,9 +111,17 @@ public class ProductController {
 	@ApiOperation(value = "Cree un produit")
 	@ResponseStatus(value = HttpStatus.CREATED)
 	@PostMapping(value = "/product")
-	public void ajouterProduit(@Valid @RequestBody final Product product) throws FreeProductException {
+	public void ajouterProduit(@Valid @RequestBody final Product product)
+//			throws FreeProductException
+	{
 
+//		if (product.getPrice() <= 0) {
+//			throw new FreeProductException(new String("Price value cannot be less or equel to 0"));
+//		} else if (product.getBoughtAtPrice() <= 0){
+//			throw new FreeProductException(new String("BoughtAtPrice value cannot be less or equel to 0"));
+//		} else {
 		this.productDao.save(product);
+//		}
 	}
 
 	@ApiOperation(value = "Remplace un produit par son ID si il existe")

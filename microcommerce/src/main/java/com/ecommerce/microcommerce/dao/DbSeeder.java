@@ -12,7 +12,7 @@ import com.ecommerce.microcommerce.model.Product;
  * replaces the sql script
  * i will also be providing a script doing exactly that
  * feel free to use that instead BUT
- * BEWARE : you will have to delete of comment this entire class beforhand
+ * BEWARE : you will have to delete of comment this entire class beforehand
  */
 @Component
 public class DbSeeder implements CommandLineRunner {
