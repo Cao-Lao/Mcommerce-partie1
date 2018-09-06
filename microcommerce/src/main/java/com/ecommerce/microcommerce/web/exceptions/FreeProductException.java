@@ -13,6 +13,7 @@ public class FreeProductException extends RuntimeException {
 	public FreeProductException(final String message) {
 
 		super(message);
+
 	}
 
 }
