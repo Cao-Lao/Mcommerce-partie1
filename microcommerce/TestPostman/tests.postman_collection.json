@@ -7,6 +7,20 @@
 	"item": [
 		{
 			"name": "Partie 1 - Affichage de la marge",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bfdc5813-79e6-4545-86c7-9b73f9ff4afe",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"assertOK\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -30,6 +44,20 @@
 		},
 		{
 			"name": "Partie 2 - Tri par ordre alphabétique",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a699e0ea-b324-4f3b-a5b0-a3adb44c9f12",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"assertOK\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -55,6 +83,20 @@
 		},
 		{
 			"name": "Partie 3.1  - Validation du prix de vente - Good value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "90fa8b0f-1594-41d6-a308-848cf8df22e5",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"assertCreated\", function() {",
+							"    pm.response.to.have.status(201);",
+							"});"
+						]
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -86,6 +128,20 @@
 		},
 		{
 			"name": "Partie 3.2 - Validation du prix de vente - Bad Price",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "52b38f16-12c5-4036-8fe2-7b0b6ed11524",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"assertCaughtNegative\", function() {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -117,6 +173,20 @@
 		},
 		{
 			"name": "Extra - Partie 3.3 - Validation du prix de vente - Bad BoughtAtPrice",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bb83930e-7317-4fd1-bc80-128f652ad38a",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"assertCaughtNegative\", function() {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -128,6 +198,51 @@
 				"body": {
 					"mode": "raw",
 					"raw": "{\n\t\"name\" : \"Smartphone\",\n\t\"price\" : 100,\n\t\"boughtAtPrice\" : -25\n}"
+				},
+				"url": {
+					"raw": "127.0.0.1:9090/product",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "9090",
+					"path": [
+						"product"
+					]
+				},
+				"description": "Si le prix de vente est de 0, lancez une exception du nom de  ProduitGratuitException  (à créer) qui retournera le bon code HTTP pour ce cas avec un message explicatif que vous définirez."
+			},
+			"response": []
+		},
+		{
+			"name": "Extra - Partie 3.4 - Validation du prix de vente - Price at 0",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ccb60de7-99b4-47a9-84e2-89fd02eb3f2e",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"assertCaughtZero\", function() {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\" : \"Smartphone\",\n\t\"price\" : 0,\n\t\"boughtAtPrice\" : 25\n}"
 				},
 				"url": {
 					"raw": "127.0.0.1:9090/product",
