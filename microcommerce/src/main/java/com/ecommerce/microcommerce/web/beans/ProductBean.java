@@ -12,6 +12,7 @@ public class ProductBean {
 
 	}
 
+
 	public ProductBean(final String name, final Float price, final Float boughtAtPrice) {
 
 		this.name = name;

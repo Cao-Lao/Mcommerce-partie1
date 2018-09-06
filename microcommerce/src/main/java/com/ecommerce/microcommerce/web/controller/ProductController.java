@@ -71,14 +71,16 @@ public class ProductController {
 		return productBeans;
 	}
 
+
 //	@ApiOperation(value = "Recupere les produits par ordre alphabetique")
-//	@GetMapping(value = "/product/order/name")
+//	@GetMapping(value = "/product/name/order")
 //	public List<Product> trierProduitsParOrdreAlphabetique() {
 //
 //		final List<Product> foundProducts = this.productDao.findByOrderByName();
 //
 //		return foundProducts;
 //	}
+
 
 	@ApiOperation(value = "Recupere les produits au prix superieur au prixLimit")
 	@GetMapping(value = "/test/product/price/greater/{limitPrice}")
